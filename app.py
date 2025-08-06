@@ -1,18 +1,19 @@
+import os
+import pickle
 from flask import Flask, request, jsonify
-import pickle
-import pickle
-
-with open('trained_model.pkl', 'rb') as f:
-    model = pickle.load(f)
 
 app = Flask(__name__)
 
-# Load your trained model
-model = pickle.load(open('trained_model.pkl', 'rb'))
+model_path = 'trained_model.pkl'
+if not os.path.isfile(model_path):
+    raise FileNotFoundError(f"{model_path} is missing!")
+
+with open(model_path, 'rb') as f:
+    model = pickle.load(f)
 
 @app.route('/')
 def home():
-    return "House Price Predictor is live!"
+    return "Model is loaded successfully!"
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -21,6 +22,5 @@ def predict():
     return jsonify({'prediction': prediction[0]})
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
